@@ -28,7 +28,7 @@ class FormViewController: UIViewController {
     }
     
     private func loadPage() {
-        let link = "https://gifts.fireflyplus.com/v3/star-wall/index.html"
+        let link = "https://gifts.fireflyplus.com/firefly-wall/"
         let url = URL(string: link)
         self.wkWebView.load(URLRequest(url: url!))
         
@@ -61,22 +61,21 @@ extension FormViewController: WKScriptMessageHandler{
         print(message.body)
         
         if message.name == "initUser" { // 用户初始化
-            let channel = "T801001"
+            let appId = "T801001"
             let key = "05e98782776b44acb34d7f59d417f89b"
             let userId = "8eb7fbb7-90db-438e-b4a9-5be03a224534"
             let countryCode = "US"
             let language = "en"
-            let taskGroup = "T801001G04"
-            let bonus = 10
+            let placementId = "T801001G05"
             let extra = ""
             let time = Int(Date().timeIntervalSince1970 * 1000)
     
-            let channelString = "channel=" + channel
+            let channelString = "appId=" + appId
             let timeString = "time=" + String(time)
             let userIdString = "userId=" + userId
             let countryCodeString = "countryCode=" + countryCode
             let languageString = "language=" + language
-            let taskGroupString = "taskGroup=" + taskGroup
+            let taskGroupString = "placementId=" + placementId
             let extraString = "extra=" + extra
             let stringToSign = channelString + "&" + countryCodeString + "&" + extraString + "&" + languageString + "&" + taskGroupString + "&" + timeString + "&" + userIdString + key // 生成待签名字符串
             print(stringToSign)
@@ -84,14 +83,14 @@ extension FormViewController: WKScriptMessageHandler{
             let sign = stringToSign.md5
             print(sign)
             var resp = [String: Any]()
-            resp["channel"] = channel
+            resp["appId"] = appId
             resp["userId"] = userId
             resp["countryCode"] = "US"
             resp["language"] = "en"
             resp["time"] = time
             resp["sign"] = sign
             resp["extra"] = extra
-            resp["taskGroup"] = taskGroup
+            resp["placementId"] = placementId
             print(resp)
             
             do {
@@ -103,9 +102,6 @@ extension FormViewController: WKScriptMessageHandler{
                 print(returnDataString)
                 
                 self.wkWebView.evaluateJavaScript(returnDataString, completionHandler: nil)
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 10) {
-                    self.wkWebView.evaluateJavaScript("window.updateBonus(" + String(bonus) + ")", completionHandler: nil)
-                }
             } catch let myJSONError {
                 print(myJSONError)
             }
